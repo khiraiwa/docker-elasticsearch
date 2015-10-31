@@ -44,5 +44,9 @@ RUN \
 
 USER elasticsearch
 WORKDIR /home/elasticsearch/elasticsearch-2.0.0
-EXPOSE 9200
-CMD chown -R elasticsearch:elasticsearch /data_elasticsearch && /home/elasticsearch/elasticsearch-2.0.0/bin/elasticsearch
+
+EXPOSE 9200 9300
+
+CMD \
+  sudo chown -R elasticsearch:elasticsearch /data_elasticsearch && \
+  /home/elasticsearch/elasticsearch-2.0.0/bin/elasticsearch
