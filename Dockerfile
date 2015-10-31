@@ -2,6 +2,8 @@ FROM ubuntu:14.04.2
 
 MAINTAINER khiraiwa
 
+ENV ES_VERSION 2.0.0
+
 # Install Java
 RUN \
   apt-get update && \
@@ -23,16 +25,16 @@ RUN \
 # Install ElastciSearch
 RUN \
   cd /home/elasticsearch && \
-  wget https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/zip/elasticsearch/2.0.0/elasticsearch-2.0.0.zip && \
-  unzip elasticsearch-2.0.0.zip && \
-  rm -f elasticsearch-2.0.0.zip
+  wget https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/zip/elasticsearch/${ES_VERSION}/elasticsearch-${ES_VERSION}.zip && \
+  unzip elasticsearch-${ES_VERSION}.zip && \
+  rm -f elasticsearch-${ES_VERSION}.zip
 
 # Install Marvel plugin
 RUN \
-  /home/elasticsearch/elasticsearch-2.0.0/bin/plugin install license && \
-  /home/elasticsearch/elasticsearch-2.0.0/bin/plugin install marvel-agent
+  /home/elasticsearch/elasticsearch-${ES_VERSION}/bin/plugin install license && \
+  /home/elasticsearch/elasticsearch-${ES_VERSION}/bin/plugin install marvel-agent
 
-ADD config/elasticsearch.yml /home/elasticsearch/elasticsearch-2.0.0/config/elasticsearch.yml
+ADD config/elasticsearch.yml /home/elasticsearch/elasticsearch-${ES_VERSION}/config/elasticsearch.yml
 
 RUN mkdir -p /data_elasticsearch/
 VOLUME ["/data_elasticsearch/"]
@@ -43,10 +45,10 @@ RUN \
   chown -R elasticsearch:elasticsearch /home/elasticsearch
 
 USER elasticsearch
-WORKDIR /home/elasticsearch/elasticsearch-2.0.0
+WORKDIR /home/elasticsearch/elasticsearch-${ES_VERSION}
 
 EXPOSE 9200 9300
 
 CMD \
   sudo chown -R elasticsearch:elasticsearch /data_elasticsearch && \
-  /home/elasticsearch/elasticsearch-2.0.0/bin/elasticsearch
+  /home/elasticsearch/elasticsearch-${ES_VERSION}/bin/elasticsearch
