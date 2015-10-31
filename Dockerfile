@@ -16,7 +16,7 @@ ENV JAVA_HOME /usr/lib/jvm/java-8-oracle
 
 # Add elasticsearch user
 RUN \
-  mkdir -p /home/elasticsearch && \
+  mkdir -p /home/elasticsearch/ && \
   groupadd -r elasticsearch && useradd -r -d /home/elasticsearch -s /bin/bash -g elasticsearch elasticsearch && \
   echo 'elasticsearch ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
@@ -27,23 +27,22 @@ RUN \
   unzip elasticsearch-2.0.0.zip && \
   rm -f elasticsearch-2.0.0.zip
 
-ADD config/elasticsearch.yml /home/elasticsearch/elasticsearch-2.0.0/config/elasticsearch.yml
-ADD config/logging.yml /home/elasticsearch/elasticsearch-2.0.0/config/logging.yml
-
 # Install Marvel plugin
 RUN \
   /home/elasticsearch/elasticsearch-2.0.0/bin/plugin install license && \
   /home/elasticsearch/elasticsearch-2.0.0/bin/plugin install marvel-agent
 
+ADD config/elasticsearch.yml /home/elasticsearch/elasticsearch-2.0.0/config/elasticsearch.yml
+
+RUN mkdir -p /data_elasticsearch/
+VOLUME ["/data_elasticsearch/"]
+
 # Mount data dir and setup home dir
 RUN \
-  mkdir -p /data_elasticsearch/to/logs && \
   chown -R elasticsearch:elasticsearch /data_elasticsearch && \
   chown -R elasticsearch:elasticsearch /home/elasticsearch
 
-VOLUME ["/data_elasticsearch/to/logs"]
-
-WORKDIR /home/elasticsearch/elasticsearch-2.0.0
 USER elasticsearch
+WORKDIR /home/elasticsearch/elasticsearch-2.0.0
 EXPOSE 9200
-CMD /home/elasticsearch/elasticsearch-2.0.0/bin/elasticsearch
+CMD chown -R elasticsearch:elasticsearch /data_elasticsearch && /home/elasticsearch/elasticsearch-2.0.0/bin/elasticsearch
